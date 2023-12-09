@@ -11,3 +11,5 @@ Boot Sector:
 * Bootsector coded in 16-bit or Real mode, for backward compatibility
 
 *  boot sector is 512 bytes long and in 510th byte a symbol 0x55 is expected and in the 511th byte another symbol 0xaa is expected.
+
+* In a typical x86-based PC, when you run a bootloader or a boot sector program, the program is loaded into memory at a specific address. The default address at which your bootloader or boot sector program is loaded is 0x7C00 (also written as 0x0000:0x7C00).
