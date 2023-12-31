@@ -36,8 +36,8 @@ In Addition to code and data segments, the CPU requires that the first entry in 
 
 
 
-Defining the GDT in Assembly:
-`````````````````````````````
+## Defining the GDT in Assembly:
+
 
 Actually the CPU needs to know how long our GDT is, we don't actually directly give the CPU the start address of our GDT but instead give it the address of a much simpler strcture called the GDT descriptor(i.e, something that describe the GDT).
 
@@ -66,14 +66,14 @@ DPL (Descriptor Privilege Level): It is a 2-bit field the level of privilege ass
 
 S (System Bit): The segment S bit in the segment descriptor determines if a given segment is a system segment or a code or a data segment. If the S bit is 1 then the segment is either a code or data segment, if it is 0 then the segment is a system segment.
 
-Type: The specifies the specific descriptor among various kinds of descriptors. 
+Type: The specifies the specific descriptor among various kinds of descriptors. 	
 
 A (Accessed Bit): The x86 automatically sets this bit when a selector for the descriptor is loaded into a segment register. This means that x86 sets accessed bit whenever a memory reference is made by accessing the segment.
 
 
 
-Defining them in code:
-``````````````````````
+#### Defining them in code:
+
 
 We will use following strcutre to define a GDT in our code:
 
@@ -89,3 +89,17 @@ We will use following strcutre to define a GDT in our code:
 54th : X
 55th : G
 56th to 63rd : BASE address (from 24th to 31th bit)
+
+
+
+#### Making the Switch:
+
+Now once our GDT and GDT descriptor have been prepared, we are ready to instruct the CPU to switch from 16-bit real mode to 32-bit protected mode.
+
+First thing we have to do is to disable interuppts using the <b>cli</b>(clear interrupt) instruction, which means CPU will simple ignores any future interrupts that may happens, atleast untill interuppts are later enabled. We have to do this to avoid any kind of CPU crash.
+
+Next step is to tell the CPU about the GDT that we just prepared. We will use the single instruction for this:
+	
+	lgdt [gdt_descriptor]
+
+Now that all in-place we will make the actual switch over, by setting the first bit of a special CPU <b>control register</b>
