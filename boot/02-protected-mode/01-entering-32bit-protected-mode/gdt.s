@@ -1,6 +1,6 @@
 gdt_start:
 
-gdt_null:
+gdt_null: #this is mendatory null descriptor
 	.quad 0x0 #8 bytes
 
 gdt_code: #the code segment descriptor
@@ -23,7 +23,8 @@ gdt_code: #the code segment descriptor
 	This is because our computer system reads 0x0 and 0x00 same as 1 byte.
 	But Why?
 	
-	Because  the smallest addressable unit in most computer architectures is a byte, which is 8 bits or 2 hexadecimal digits,
+	Because  the smallest addressable unit in most computer architectures is a byte,
+	which is 8 bits or 2 hexadecimal digits,
 	and each hexadecimal digit represents a nibble(4 bit).
 
 	*/

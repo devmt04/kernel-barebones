@@ -12,12 +12,14 @@ trying to fits address which will be out of range of 16-bit registers.
 
 Also note the:
 
-In GAS, we will use () to load a address from a var/reg to a var/register, like:
-	mov %dl, (BOOT_DRIVE) #will load value at dl into memory address in var BOOT_DRIVE
-	mov (BOOT_DRIVE), %ax #move address st BOOT_DRIVE  var into a register
+In GAS,     
+	[0x1234]: Memory dereferencing.
+    (0x1234): Immediate value.
 
-But for a direct memory address to a var/regiser, we don;t use (), like:
-	mov 0x1234, %ax
+    also () around a VAR or REG used to access values stored in address represented by them
+    like (BOOT_DRIVE), (%ebx
+
+    just BOOT_DRIVE will represent the address of it.
 */
 	
 .code16
@@ -57,7 +59,7 @@ sucessful:
 	// movb $0x42, %al
 	
 	// mov , %si  # Set SI register to point to the memory address 0x1234
-	movb %es:[0x1234], %al   # Load the data at memory location 0x1234 from begeniing of 0x1000
+	movb %es:[0x1234], %al #Load the data at memory location 0x1234 from begeniing of 0x1000
 	
 
 	int $0x10

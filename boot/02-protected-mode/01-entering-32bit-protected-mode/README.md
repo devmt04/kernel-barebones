@@ -1,6 +1,6 @@
 # Protected Mode
 
-* It is 32-bit mode, herr we can freely use all 32-bit registers, unline in real mode, where we were restricted to only 16-bit registers.
+* It is 32-bit mode, here we can freely use all 32-bit registers, unlike in real mode, where we were restricted to only 16-bit registers.
 
 * 32-bit memory offsets are available, so an offset can refrence a whopping a 4GB of memory (0xffffffff).
 
@@ -102,4 +102,27 @@ Next step is to tell the CPU about the GDT that we just prepared. We will use th
 	
 	lgdt [gdt_descriptor]
 
-Now that all in-place we will make the actual switch over, by setting the first bit of a special CPU <b>control register</b>
+Now that all in-place we will make the actual switch over, by setting the first bit of a special CPU control register <b>cr0</b>. Now, we cannot set that bit directly on the register, so we must load it into a genrel purpose register, set the bit, then store it back into cr0. For this we will use the <b>or</b> instructionto include certain bits into a value, without disturbing any other bits that, for some important reason, may have been set already in the control register.
+
+
+	mov %cr0, %eax
+	or $0x1, %eax
+	mov %eax, %cr0
+
+After cr0 has been updated, the CPU is in 32-bit mode, but there is a issue with modern processor, that is, they use a technique called pipelining, that allows them to process diffrent stages of an instructions's execution in parallel. Now there is a risk that CPU may process some stages of an instruction's execution in wrong mode. So what we need to do, immediately after instructing the CPU to switch node, is to force CPU to finish any jobs in its pipeline, so that we can be confident that all future instructions will be executed in correct mode.
+
+Now pipelining works very well when the CPU knows about the next few instructions that will be coming over the horizon, since it can pre-fetch them, but it doesn't like instructions such as <b>jmp</b> or <b>call</b>, because untill those instructions have been executed fully the CPU can have no idea about the instructions that will follow them, especially if we use a <b>far jump</b> or <b>call</b>, which means, jump to another segment.
+
+So immediately after instructing the CPU to switch mode, we can issue a far jump, which will force the CPU to flush the pipeline i.e, complete all of instructions currently in diffrent stages of the pipeline.
+
+To issue a far jump, we additionally provide the target segment as:
+
+	jmp <segment>:<address offset>
+	
+
+btw
+
+	~ jmp is an unconditional jump to a specified location.
+    
+    ~ call is used to call subroutines or functions and saves the return address to allow the program to return after executing the subroutine.
+

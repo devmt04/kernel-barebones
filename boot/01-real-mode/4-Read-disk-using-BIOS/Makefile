@@ -1,8 +1,10 @@
 ASM = as
 LD = ld
 
-bootsector.bin : bootsector.s
+bootsector.bin : bootsector.o
 	$(ASM) $< -o bootsector.o
+	
+bootsector.o : bootsector.s
 	$(LD) --oformat binary bootsector.o -o $@ -Ttext 0x7c00
 
 run : bootsector.bin
