@@ -100,8 +100,8 @@ init_pm:
   mov %ax, %gs
 
   //Update our stack pos so it is right at top of free space
-  //For Liner address range of memory, see table in top comments.
-  mov $0x90000, %ebp 
+  //For Linear address range of memory, see table in top comments.
+  mov $0x9000, %ebp 
   mov %ebp, %esp
 
   call BEGIN_PM

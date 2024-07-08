@@ -1,0 +1,37 @@
+ASM = as
+LD = ld
+
+bootsector.bin : bootsector.s
+	$(ASM) -g $< -o bootsector.o
+	$(LD) --oformat binary bootsector.o -o $@ -Ttext 0x7c00
+
+Kernel/kernel_entry.o :
+	as -g Kernel/kernel_entry.s -o Kernel/kernel_entry.o
+
+Kernel/kernel.o :
+	gcc -g -ffreestanding -c Kernel/kernel.c -o Kernel/kernel.o -lc -fno-pie
+
+compile :
+	gcc -ffreestanding -c -S Kernel/kernel.c -o Kernel/kernel.s -lc -fno-pie
+
+kernel.bin :  Kernel/kernel_entry.o Kernel/kernel.o
+	ld -o kernel.bin -Ttext 0x1000 Kernel/kernel_entry.o Kernel/kernel.o --oformat binary 
+
+os-image : bootsector.bin kernel.bin
+	cat bootsector.bin kernel.bin > os-image
+
+run : os-image
+	qemu-system-x86_64 $<
+
+kernel.elf: Kernel/kernel_entry.o Kernel/kernel.o
+	ld -o $@ -Ttext 0x1000 $^ 
+
+
+debug: os-image kernel.elf
+	qemu-system-x86_64 -s -S -fda os-image 
+
+dbserver :
+	gdb -ex "target remote localhost:1234" -ex "symbol-file kernel.elf"
+
+clean:
+	rm -f bootsector.bin kernel.bin os-image Kernel/kernel.o
