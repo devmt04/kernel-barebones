@@ -1,7 +1,6 @@
 # IMPORTANT ANNOUNCEMENT !
 
-###  Due to some unknown bugs in our bootloader, we are switching to GRUB, to boot our kernel, to keep continuing this journey. A new directory with name "grub-boot" is created
-where the further code and documentation will be uploaded! 
+###  Due to some unknown bugs in our bootloader, we are switching to GRUB, to boot our kernel, to keep continuing this journey. A new directory with name "grub-boot" is created where the further code and documentation will be uploaded! 
 
 
 # Writing Kernel in C
