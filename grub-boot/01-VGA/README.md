@@ -16,7 +16,7 @@ Screen Dimensions: Standard VGA text mode is 80 columns by 25 rows.
 ```c
 volatile uint16_t *video_memory = (volatile uint16_t *video_memory)0xB8000;
 uint8_t color = 0x0F; // 0x0F is typically white on black
-uint16_t value = (color << 8) | 'H'; // This will put char 'H' at first byte(or 8 bit) of 2-byte(or 16-bit) video_memory address(which is here 0xB8000, i.e, starting address of VGA Framebuffer) and the other 1-bye color attribute value to next byte of video_memory address(which would be 0xB8001).
+uint16_t value = 'H' | (color << 8); // This will put char 'H' at first byte(or 8 bit) of 2-byte(or 16-bit) video_memory address(which is here 0xB8000, i.e, starting address of VGA Framebuffer) and the other 1-bye color attribute value to next byte of video_memory address(which would be 0xB8001).
 *video_memory = value;
 
 // it's advisable to use a volatile qualifier when working with memory-mapped I/O, which ensures that the compiler doesn't optimize away reads or writes to this memory location
