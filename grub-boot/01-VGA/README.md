@@ -6,10 +6,10 @@ VGA text mode uses memory-mapped I/O, with the starting address typically being 
 
 The screen in text mode is represented as a 2D array of characters, where each character cell consists of two bytes:
 
-...The first byte is the ASCII character to be displayed.
-...The second byte is the attribute byte (foreground and background color).
+The first byte is the ASCII character to be displayed.
+The second byte is the attribute byte (foreground and background color).
 
-### Screen Dimensions: Standard VGA text mode is 80 columns by 25 rows.
+Screen Dimensions: Standard VGA text mode is 80 columns by 25 rows.
 
 ## Writing to VGA Text Mode
 
