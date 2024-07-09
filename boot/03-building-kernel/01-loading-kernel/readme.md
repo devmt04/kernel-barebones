@@ -32,7 +32,7 @@ The steps involves are:
 -> Switch to 32-bit protected code
 -> Begin executing our kernel code
 
-Now to simplify the problem of which disk and from which sectors have to load the kernel code, the bootsector and kernel of an operating system can be grafted together into a kernel image, which can be written ti the initial sectors of boot disk, such that the bootsector code is always at the head of the kernel image.
+Now to simplify the problem of which disk and from which sectors have to load the kernel code, the bootsector and kernel of an operating system can be grafted together into a kernel image, which can be written tO the initial sectors of boot disk, such that the bootsector code is always at the head of the kernel image.
 
 Once we have compiled our kernel & bootsector code, we can create our kernel image with the following file concatenation command:
 
