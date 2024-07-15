@@ -36,14 +36,20 @@ $(OBJ_DIR)/kernel_entry.o : kernel/kernel_entry.s
 
 define generate_rule
 $(1) : 
-	gcc -c $(patsubst $(OBJ_DIR)/%, $(SRC_DIR)/%, $(subst _,/,$(1:.o=.c))) -o $(1) -m32 -ffreestanding
+	gcc -c $(patsubst $(OBJ_DIR)/%, $(SRC_DIR)/%, $(subst _,/,$(1:.o=.c))) -o $(1) -m32 -ffreestanding -nostdlib
 endef
 
 $(foreach src, $(O_SRC), $(eval $(call generate_rule, $(src))))
 
 run : all
-	qemu-system-i386 -cdrom $(OUTPUT)
+	qemu-system-i386 -cdrom $(OUTPUT) -m 512
 
+
+debug :
+	qemu-system-i386 -cdrom $(OUTPUT) -m 512 -s -S 
+
+dbserver :
+	gdb $(BIN_DIR)/kernel.bin -ex "target remote localhost:1234"
 
 clean : 
 	rm -r build release
