@@ -22,7 +22,7 @@ Check these they will surely help you to understand this in more detail:<br><br>
 
 <a target="_blank" href="https://opensecuritytraining.info/IntroBIOS_files/Day1_04_Advanced%20x86%20-%20BIOS%20and%20SMM%20Internals%20-%20IO.pdf"><u>1 - (Do not forget to check which registers are being used to store port address and data while using `in` and `out` instructions. `ax` is used to store data, which we need to pass or fetch from port address stored in `dx` register or use drectly as immeduate value)</u></a><br><br>
 
-<a target="_blank" href="https://pdos.csail.mit.edu/6.828/2008/readings/i386/c08.htm"><u>2</u></a><br><br>
+<a target="_blank" href="https://pdos.csail.mit.edu/6.828/2008/readings/i386/c08.htm"><u>2 - I/O features of the 80386</u></a><br><br>
 
 <a target="_blank" href="http://www-ug.eecg.utoronto.ca/desl/manuals/ps2.pdf
 "><u>3 - PS/2 Protocol Documentation, you can use this to see what data you can get/give to PS/2 devices.</u></a><br><br>
