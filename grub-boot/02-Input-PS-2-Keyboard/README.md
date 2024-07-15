@@ -22,7 +22,7 @@ Check these they will surely help you to understand this in more detail:<br><br>
 
 <a target="_blank" href="https://opensecuritytraining.info/IntroBIOS_files/Day1_04_Advanced%20x86%20-%20BIOS%20and%20SMM%20Internals%20-%20IO.pdf"><u>1 - (Do not forget to check which registers are being used to store port address and data while using `in` and `out` instructions. `ax` is used to store data, which we need to pass or fetch from port address stored in `dx` register or use drectly as immeduate value)</u></a><br><br>
 
-<a target="_blank" href="https://pdos.csail.mit.edu/6.828/2008/readings/i386/c08.htmf"><u>2</u></a><br><br>
+<a target="_blank" href="https://pdos.csail.mit.edu/6.828/2008/readings/i386/c08.htm"><u>2</u></a><br><br>
 
 <a target="_blank" href="http://www-ug.eecg.utoronto.ca/desl/manuals/ps2.pdf
 "><u>3 - PS/2 Protocol Documentation, you can use this to see what data you can get/give to PS/2 devices.</u></a><br><br>
@@ -38,12 +38,12 @@ Check these they will surely help you to understand this in more detail:<br><br>
 
 ```asm
 _start:
-	# Disable PS/2 port 1 (command 0xAD)
+	; Disable PS/2 port 1 (command 0xAD)
 	movb $0xAD, %al
 	movb $0x64, %dx
 	outb %al, %dx
 
-	# Enable PS/2 port 1 (command 0xAD)
+	; Enable PS/2 port 1 (command 0xAD)
 	movb $0xAE, %al
 	movb $0x64, %dx
 	outb %al, %dx
@@ -53,12 +53,12 @@ _start:
 
 ```assembly
 read_loop:
-	# Polling loop to check if data is available 
+	; Polling loop to check if data is available 
 	inb $0x64, %al
-    testb $0x01, %al  # testb - performs bitwise AND, checks if output buffer full (bit 0 set)
-    jz read_loop      # If not, loop back to check again
+    testb $0x01, %al  ; testb - performs bitwise AND, checks if output buffer full (bit 0 set)
+    jz read_loop      ; If not, loop back to check again
 
-    # Read scan code from PS/2 data port
+    ; Read scan code from PS/2 data port
     inb $0x60, %al # scan code stored in %al
 ```
 
