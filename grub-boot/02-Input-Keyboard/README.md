@@ -28,7 +28,7 @@ uint16_t value = 'H' | (color << 8); // This will put char 'H' at first byte(or 
 make
 ```
 
-This will create a .iso disk image in outs folder.
+This will create a .iso disk image in `release/iso` folder.
 
 ## Run the Project
 
