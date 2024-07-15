@@ -18,13 +18,18 @@ The CPU interacts with I/O ports through special instructions (`in` and `out` in
 
 These instructions are part of the CPU’s instruction set and enable direct communication with devices connected to the system via I/O ports.
 
-Check these they will surely help you to understand this in more detail:
-<a target="_blank" hreaf="https://opensecuritytraining.info/IntroBIOS_files/Day1_04_Advanced%20x86%20-%20BIOS%20and%20SMM%20Internals%20-%20IO.pdf"><u>1 - (Do not forget to check which registers are being used to store port address and data while using `in` and `out` instructions. `ax` is used to store data, which we need to pass or fetch from port address stored in `dx` register or use drectly as immeduate value)</u></a><br>  
-<a target="_blank" hreaf="https://pdos.csail.mit.edu/6.828/2008/readings/i386/c08.htmf"><u>2</u></a><br>
-<a target="_blank" hreaf="http://www-ug.eecg.utoronto.ca/desl/manuals/ps2.pdf
-"><u>3 - PS/2 Protocol Documentation, you can use this to see what data you can get/give to PS/2 devices.</u></a>
-<a target="_blank" hreaf="https://wiki.osdev.org/%228042%22_PS/2_Controller#Interrupts"><u>4 - OSDevWiki - you can see here wht bits you can pass to PS/2 Controller(Not PS/2 device).</u></a>
-<a target="_blank" hreaf="https://valhalla.altium.com/Learning-Guides/PS2-PS2_Controller.pdf"><u>5 - Another documentaion, seems to contain more detail about PS/2 Protocol.</u></a>
+Check these they will surely help you to understand this in more detail:<br><br>
+
+<a target="_blank" href="https://opensecuritytraining.info/IntroBIOS_files/Day1_04_Advanced%20x86%20-%20BIOS%20and%20SMM%20Internals%20-%20IO.pdf"><u>1 - (Do not forget to check which registers are being used to store port address and data while using `in` and `out` instructions. `ax` is used to store data, which we need to pass or fetch from port address stored in `dx` register or use drectly as immeduate value)</u></a><br><br>
+
+<a target="_blank" href="https://pdos.csail.mit.edu/6.828/2008/readings/i386/c08.htmf"><u>2</u></a><br><br>
+
+<a target="_blank" href="http://www-ug.eecg.utoronto.ca/desl/manuals/ps2.pdf
+"><u>3 - PS/2 Protocol Documentation, you can use this to see what data you can get/give to PS/2 devices.</u></a><br><br>
+
+<a target="_blank" href="https://wiki.osdev.org/%228042%22_PS/2_Controller#Interrupts"><u>4 - OSDevWiki - you can see here wht bits you can pass to PS/2 Controller(Not PS/2 device).</u></a><br><br>
+
+<a target="_blank" href="https://valhalla.altium.com/Learning-Guides/PS2-PS2_Controller.pdf"><u>5 - Another documentaion, seems to contain more detail about PS/2 Protocol.</u></a><br><br>
 
 
 <b>NOTE: All this is only for PS/2 controlled Keyboard (not one that are connected to USB, as they follow diffrent protocol for communication). However, any keyboard will work fine if run under Qemu(and probably others) emulator.</b>
@@ -46,7 +51,7 @@ _start:
 
 ## Read keyboard scan code
 
-```asm
+```assembly
 read_loop:
 	# Polling loop to check if data is available 
 	inb $0x64, %al
@@ -54,7 +59,7 @@ read_loop:
     jz read_loop      # If not, loop back to check again
 
     # Read scan code from PS/2 data port
-    inb $PS2_DATA_PORT, %al # scan code stored in %al
+    inb $0x60, %al # scan code stored in %al
 ```
 
 ## Compile the Project
