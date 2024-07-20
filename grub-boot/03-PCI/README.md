@@ -18,7 +18,7 @@ The area of our intrest, for now, in this document is to learn about <b>protocol
 
 - PCI defines three physical address space: The Memory Address Space, The I/O Address Space, and The Conigurational Address Space.
 
-- Every PCI Target (except host bus bridge) are required to impliment `Base Address Register(s)` to request a range of addresses which can be used to provide access to internal registers or functions.
+- Every PCI Target (except host bus bridge) are required to impliment Base Address Register(s) to request a range of addresses which can be used to provide access to internal registers or functions.
 
 - A device(PCI Target) may map it's internal register into both Memory Space or I/O space.
 
@@ -33,13 +33,13 @@ The area of our intrest, for now, in this document is to learn about <b>protocol
 - The `CONFIG_ADDRESS` register is 32 bits with format: (you can refer to Chapter 3, Figure 3-2 from the PCI 3.0 Specification Document)
 	
 
-	bit 0-2   : Must be 0
-	bit 2-7   : Register Number
-	bit 8-10  : Function Number
-	bit 11-15 : Device Number 
-	bit 16-23 : Bus Number
-	bit 24-30 : (Reserved)
-	bit 31 	  : Enable Bit (1 = 'enabled', 0 = 'disabled')
+	bit 0-2   : Must be 0<br>
+	bit 2-7   : Register Number<br>
+	bit 8-10  : Function Number<br>
+	bit 11-15 : Device Number <br>
+	bit 16-23 : Bus Number<br>
+	bit 24-30 : (Reserved)<br>
+	bit 31 	  : Enable Bit (1 = 'enabled', 0 = 'disabled')<br>
 
 
 - To access a particulat PCI-Target device, we must provide the above entries in `CONFIG_ADDRESS` register. In return, the results will be stored under `CONFIG_DATA` register. (See about these entries in detail in PCI 3.0 Specification document)
