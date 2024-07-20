@@ -32,6 +32,9 @@ Check these they will surely help you to understand this in more detail:<br><br>
 <a target="_blank" href="https://valhalla.altium.com/Learning-Guides/PS2-PS2_Controller.pdf"><u>5 - Another documentaion, seems to contain more detail about PS/2 Protocol.</u></a><br><br>
 
 
+<a target="_blank" href="https://edc.intel.com/content/www/us/en/design/products/platforms/processor-and-core-i3-n-series-datasheet-volume-1-of-2/001/fixed-i-o-address-ranges/"><u>6 - List of fixed I/O address ranges, from Intel.</u></a><br><br>
+
+
 <b>NOTE: All this is only for PS/2 controlled Keyboard (not one that are connected to USB, as they follow diffrent protocol for communication). However, any keyboard will work fine if run under Qemu(and probably others) emulator.</b>
 
 ## Restart PS/2 Controller
