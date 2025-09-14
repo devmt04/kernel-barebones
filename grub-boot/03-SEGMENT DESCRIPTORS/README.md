@@ -50,6 +50,91 @@ The global address space is used for system-wide data and procedures including o
 The other half of the virtual address space comprising those addresses with the TI bit set-is separately mapped for each task in the system. Because such an address space is local to the task for which it is defined, it is referred to as a local address space. In general, code and data segments within a task's local address space are private to that particular task or user.
 
 
+## System Address Registers
+
+- **Global Descriptor Table Register (GDTR)** : is a dedicated 40 bit (5 byte) register used to record
+the base and size of a system's global descriptor table (GDT). Thus, two of these bytes define the size of the GDT, and three bytes define its base address.
+
+The register contents are "hidden" only in the sense that they are not accessible by means of ordinary instructions. Instead, the dedicated protected instructions **LGDT** and **SGDT** are reserved for loading and storing, respectively, the contents of the GDTR at Protected Mode initialization.
+
+
+- **Local Descriptor Table Register (LDTR)** : is a dedicated 40-bit register that contains, at any given moment, the base and size of the local descriptor table (LDT) associated with the currently executing task. 
+
+Unlike GDTR, the LDTR register contains both a "visible" and a "hidden" component. Only the visible component is accessible, while the hidden component remains truly inaccessible even to dedicated instructions.
+
+The visible component of the LDTR is a 16·bit "selector" field. The format of these 16 bits corresponds exactly to that of a segment selector in a virtual address pointer. Thus, it contains a 13·bit INDEX field, a l·bit TI field, and a 2·bit RPL field. The TI "table indicator" bit must be zero, indicating a reference to the GDT (i.e., to global address space). The INDEX field consequently provides an index to a particular entry within the GDT. This entry, in,turn, must be an LDT descriptor (or descriptor table descriptor), as defined in the previous section. In this way, the visible "selector" field of the LDTR, by selecting an LDT descriptor, uniquely designates a particular LDT in the system.
+
+The dedicated, protected instructions __LLDT__ and __SLDT__ are reserved for loading and storing, respectively, the visible selector component of the LDTR register.
+
+The processor locates the GDT and the current LDT in memory by means of the GDTR and LDTR registers. These registers store the base addresses of the tables in the linear address space and store the segment limits. The instructions LGDT and SGDT give access to the GDTR; the instructions LLDT and SLDT give access to the LDTR.
+
+## Descriptors
+
+The segment descriptor provides the processor with the data it needs to map a logical address into a linear address.
+
+Segment-descriptor fields are:
+
+- BASE: Defines the location of the segment within the 4 gigabyte linear address space. The processor concatenates the three fragments of the base address to form a single 32-bit value.
+
+- LIMIT: Defines the size of the segment. When the processor concatenates the two parts of the limit field, a 20-bit value results. The processor interprets the limit field in one of two ways, depending on the setting of the granularity bit:
+
+1. In units of one byte, to define a limit of up to 1 megabyte.
+
+2. In units of 4 Kilobytes, to define a limit of up to 4 gigabytes. The limit is shifted left by 12 bits when loaded, and low-order one-bits are inserted.
+
+- Granularity bit: Specifies the units with which the LIMIT field is interpreted. When the bit is clear, the limit is interpreted in units of one byte; when set, the limit is interpreted in units of 4 Kilobytes.
+
+- TYPE: Distinguishes between various kinds of descriptors.
+
+- DPL (Descriptor Privilege Level): Used by the protection mechanism.
+
+- Segment-Present bit: If this bit is zero, the descriptor is not valid for use in address transformation; the processor will signal an exception when a selector for the descriptor is loaded into a segment register.
+
+- Accessed bit: The processor sets this bit when the segment is accessed; i.e., a selector for the descriptor is loaded into a segment register or used by a selector test instruction.
+
+
+#### DESCRIPTOR DATA STRUCTURE
+
+0th to 15th bit : LIMIT (upto its 16 bit from 0th to 15th bit out of 20bit)
+
+16th to 39th bit : BASE address (upto its 24 bit from 0th to 23th bit out of total 32bit)
+
+40th and 43th bit : TYPE
+
+44th bit : S
+
+45th bit and 46th bit : DPL
+
+47th : P
+
+48th to 51th : LIMIT (16th to 19th bit)
+
+52th : U
+
+53rd : O
+
+54th : X
+
+55th : G
+
+56th to 63rd : BASE address (from 24th to 31th bit)
+
+
+---
+
+- O(Reserved by Intel): This bit must be zero for compatibility with future processors.
+
+- U/AVL (User Bit): This bit is completely undefined, and x86 ignores it.
+
+- P (Present Bit): The present P bit is 1 if the segment is loaded in the physical memory, if P = 0 then any attempt to access this segment causes a not-present exception.
+
+- DPL (Descriptor Privilege Level): It is a 2-bit field the level of privilege associated with the memory space that the descriptor defines – DPL0 is the most privileged whereas DPL3 is the least privileged.
+
+- S (System Bit): The segment S bit in the segment descriptor determines if a given segment is a system segment or a code or a data segment. If the S bit is 1 then the segment is either a code or data segment, if it is 0 then the segment is a system segment.
+
+- A (Accessed Bit): The x86 automatically sets this bit when a selector for the descriptor is loaded into a segment register. This means that x86 sets accessed bit whenever a memory reference is made by accessing the segment.
+
+
 ## DESCRIPTOR TABLES
 
 The descriptor table contents govern the interpretation of virtual addresses.
@@ -58,7 +143,61 @@ Within a **Protected Mode system**, there are ordinarily several descriptor tabl
 
 For each task in the system, a pair of descriptor tables-consisting of the GDT (shared by all tasks) and a particular LDT (private to the task or to a group of closely related tasks)-provides a complete description of that task's virtual address space. The protection mechanism ensures that a task is granted access only to its own virtual address space. In the simplest of system configurations, tasks can reside entirely within the GDT without the use of local descriptor tables. This will simplify system software by only requiring maintenance of one table (the GDT) at the expense of no isolation between tasks.
 
-The descriptor tables consist of a sequence of 8-byte entries called descriptors. A descriptor table may contain from 1 to 8192 entries.
+A descriptor table is simply a memory array of 8-byte entries called descriptors. A descriptor table may contain from 1 to 8192 entries. The first entry of the GDT (INDEX=0) is not used by the processor.
+
+Because the first entry of the GDT is not used by the processor, a selector that has an index of zero and a table indicator of zero (i.e., a selector that points to the first entry of the GDT), can be used as a null selector.
 
 
+#### Basic GDT in GAS Assembly
+
+```
+gdt_start:
+
+gdt_null: #null descriptor
+   .quad 0x0 #8 bytes
+
+gdt_code: #the code segment descriptor
+   # base = 0x00
+   # limit or size = 0xfffff
+   # 1st flags : present - 1, privilege - 00, descriptor type - 1 : 1001
+   # type flags : code - 1, conforming - 0, readable - 1, accessed - 0 : 1010
+   # 2nd flag : granularity - 1, 32bit default - 1, 64-bit seg - 0, AVL - 0 : 1100
+   
+   .word 0xffff #limit
+   .word 0x0000 #base
+   .byte 0x00   #base
+   .byte 0b10011010 #1st flags, type flags
+   .byte 0b11001111 #2nd flags, limit
+   .byte 0x0 #base
+
+
+gdt_data:
+   # type flags : code - 0, expand down - 0, writable - 1, accessed - 0 -> 0010
+
+   .word 0xffff
+   .word 0x0
+   .byte 0x0 
+   .byte 0b10010010
+   .byte 0b11001111
+   .byte 0x0
+
+gdt_end: # use to calculate size of GDT
+
+
+gdt_descriptor:
+   .word gdt_end - gdt_start - 1 #size of GDT
+   .long gdt_start #start address of our GDT
+
+```
+
+
+## References
+
+https://wiki.osdev.org/GDT_Tutorial
+
+https://pdos.csail.mit.edu/6.828/2018/readings/i386.pdf - INTEL 80386 PROGRAMMER'S REFERENCE MANUAL 1986
+
+https://bitsavers.trailing-edge.com/components/intel/80286/210498-005_80286_and_80287_Programmers_Reference_Manual_1987.pdf  - INTEL 80286 AND 80287 PROGRAMMER'S REFERENCE MANUAL 1987
+
+https://www.intel.com/content/www/us/en/developer/articles/technical/intel-sdm.html  -  Intel® 64 and IA-32 Architectures Software Developer Manuals
 
