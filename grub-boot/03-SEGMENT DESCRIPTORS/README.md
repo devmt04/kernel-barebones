@@ -190,6 +190,61 @@ gdt_descriptor:
 
 ```
 
+## Loading GDT into GDTR
+
+As we are using GRUB, GRUB already built a minimal GDT for us. In order to overwrite it, we need to again, load `gdt_descriptor` with `lgdt` instruction, and update all segment registers with new entries.
+
+To load `gdtr` with a new `gdt_descriptor`, we have to follow the same approach, that was initially followed(by GRUB) while switching to Protected Mode from Real Mode.
+
+The Procedure was:
+
+Setting the PE bit of the MSW in CR0, results the 80386 to begin executing in protected mode. The current privilege level (CPL) starts at zero. The segment registers continue to point to the same linear addresses as in real address mode (in real address mode, linear addresses are the same physical addresses)
+
+Immediately after setting the PE flag, the initialization code must flush the processor's instruction prefetch queue by executing a JMP instruction. The 80386 fetches and decodes instructions and addresses before they are used; however, after a change into protected mode, the prefetched instruction information (which pertains to real-address mode) is no longer valid. A JMP forces the processor to discard the invalid information.
+
+
+```
+WHY ISSUING A JMP?
+''''''''''''''''''
+
+After cr0 has been updated, the CPU is in 32-bit mode, but there is a issue with modern processor, that is, they use a technique called pipelining, that allows them to process different stages of an instructions execution in parallel. Now there is a risk that CPU may process some stages of an instruction's execution in wrong mode. So what we need to do, immediately after instructing the CPU to switch node, is to force CPU to finish any jobs in its pipeline, so that we can be confident that all future instructions will be executed in correct mode.
+
+Now pipelining works very well when the CPU knows about the next few instructions that will be coming over the horizon, since it can pre-fetch them, but it doesn't like instructions such as <b>jmp</b> or <b>call</b>, because until those instructions have been executed fully the CPU can have no idea about the instructions that will follow them, especially if we use a <b>far jump</b> or <b>call</b>, which means, jump to another segment.
+
+So immediately after instructing the CPU to switch mode, we can issue a far jump, which will force the CPU to flush the pipeline i.e, complete all of instructions currently in different stages of the pipeline.
+```
+
+However PE bit is already set, all we need to do now is:
+
+- load `gdt_descriptor` with `lgdt`
+- issue a far jump
+- update all segment registers with new segment values 
+
+
+```
+load_gdt:
+   lgdt [gdt_descriptor]
+
+   mov $0x10, %ax
+   mov %ax, %ds  ; 0x10 is the offset in the GDT to our data segment
+   mov %ax, %ss
+   mov %ax, %es
+   mov %ax, %fs
+   mov %ax, %gs
+   jmp 0x08:.flush ; 0x08 is the offset to our code segment: Far jump!
+
+.flush:
+   ret
+
+```
+
+The CS register doesn't have to be touched, because our jump fills it with proper segment values
+
+
+
+
+
+
 
 ## References
 
