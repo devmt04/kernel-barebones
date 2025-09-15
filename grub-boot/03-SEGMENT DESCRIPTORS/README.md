@@ -223,7 +223,7 @@ However PE bit is already set, all we need to do now is:
 
 ```
 load_gdt:
-   lgdt [gdt_descriptor]
+   lgdt gdt_descriptor
 
    mov $0x10, %ax
    mov %ax, %ds  ; 0x10 is the offset in the GDT to our data segment
@@ -231,7 +231,7 @@ load_gdt:
    mov %ax, %es
    mov %ax, %fs
    mov %ax, %gs
-   jmp 0x08:.flush ; 0x08 is the offset to our code segment: Far jump!
+   jmp $0x08, $.flush ; 0x08 is the offset to our code segment: Far jump!
 
 .flush:
    ret

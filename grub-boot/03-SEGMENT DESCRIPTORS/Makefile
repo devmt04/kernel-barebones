@@ -26,10 +26,13 @@ prep :
 $(OUTPUT) : $(BIN_DIR)/kernel.bin
 	cp $(BIN_DIR)/kernel.bin build/iso/boot/ 
 	cp grub.cfg build/iso/boot/grub
-	grub-mkrescue -o $@ build/iso
+	grub2-mkrescue -o $@ build/iso
 
-$(BIN_DIR)/kernel.bin : $(OBJ_DIR)/kernel_entry.o  $(O_SRC) 
+$(BIN_DIR)/kernel.bin : $(OBJ_DIR)/kernel_entry.o $(O_SRC) $(OBJ_DIR)/gdt.o
 	ld -m elf_i386 -T linker.ld -o $@ $^
+
+$(OBJ_DIR)/gdt.o : kernel/gdt.s 
+	as --32 -o $@ $^
 
 $(OBJ_DIR)/kernel_entry.o : kernel/kernel_entry.s
 	as --32 -o $@ $^

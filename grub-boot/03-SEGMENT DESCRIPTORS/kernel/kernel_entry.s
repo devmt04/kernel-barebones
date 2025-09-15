@@ -8,6 +8,9 @@
 	.global _start 
 
 .extern main
+.extern load_gdt
+
 _start:
+ call load_gdt
  call main
  hlt
