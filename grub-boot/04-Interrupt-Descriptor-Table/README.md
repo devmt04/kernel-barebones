@@ -1,8 +1,28 @@
 # Interrupt Descriptor Table
 
-## Overview
+## Exceptions and interrupts
 
-Interrupts are special cases of control transfer within a program. An interrupt occurs as a result of an event that is independent of the currently executing program.
+**Exceptions** and **interrupts** are forced transfers of execution to a task or a procedure. The task or procedure is called a handler. Interrupts occur at random times during the execution of a program, in response to signals from hardware. Exceptions occur when instructions are executed which provoke exceptions. Interrupts are used to handle events external to the processor, such as requests to service peripheral devices. Exceptions handle conditions detected by the processor in the course of executing instructions, such as division by O.
+
+There are two sources for interrupts and three sources for exceptions:
+
+1. Interrupts
+   
+   - **External or Maskable Interrupts**, External interrupts are received through pins on the processor or through the local APIC, like those collected from devices (keyboard, timer, NIC, etc). Maskable hardware interrupts that can be delivered through the INTR pin include all IA-32 architecture defined interrupt vectors from 0 through 255; those that can be delivered through the local APIC include interrupt vectors 16 through 255. Maskable interrupts do not occur unless the interrupt-enable flag (IF) is set.
+
+   When interrupts 0 through 15 are delivered through the local APIC, the APIC indicates the receipt of an illegal vector.
+
+   - **Software-Generated or Nonmaskable Interrupts**, The INT n instruction permits interrupts to be generated from within software by supplying an interrupt vector number as an operand. For example, the INT 35 instruction forces an implicit call to the interrupt handler for interrupt 35. These are received on the NMI (Non-Maskable Interrupt) input of the processor. The processor does not provide a mechanism to prevent nonmaskable interrupts, i.e, Interrupts generated in software with the INT n instruction cannot be masked by the IF flag in the EFLAGS register.
+
+2. Exceptions
+
+   - **Processor-detected program-error exceptions**, The processor generates one or more exceptions when it detects program errors during the execution in an application program or the operating system or executive. Intel 64 and IA-32 architectures define a vector number for each processor-detectable exception. Exceptions are classified as faults, traps, and aborts
+
+   - **Programmed or Software-Generated Exceptions**. The INTO, INT1, INT3, and BOUND instructions permit exceptions to be generated in software. These instructions allow checks for exception conditions to be performed at points in the instruction stream. For example, INT3 causes a breakpoint exception to be generated.
+
+   - **Machine-check exceptions**, The P6 family and Pentium processors provide both internal and external machine-check mechanisms for checking the operation of the internal chip hardware and bus transactions. These mechanisms are implementation dependent. When a machine-check error is detected, the processor signals a machine-check exception and returns an error code.
+
+## IDT
 
 The Interrupt Descriptor Table (IDT) is a binary data structure specific to the IA-32 and x86-64 architectures. It is the Protected Mode and Long Mode counterpart to the Real Mode **Interrupt Vector Table (IVT)** telling the CPU where the Interrupt Service Routines (ISR) are located (one per interrupt vector). It is similar to the GDT in structure.
 
@@ -69,6 +89,8 @@ IDT Gate Descriptors structure:
    bit 45 to bit 46 : DPL
    bit 47 : P
    bit 48 to bit 63 : OFFSET
+
+
 
 
 - Interrupts 0 to 31 are pre-defined interrupts. (see table at https://wiki.jwo.cz/wiki/x86_protected_mode_interrupts)
