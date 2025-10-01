@@ -9,7 +9,6 @@ There are two sources for interrupts and three sources for exceptions:
 1. Interrupts
    
    - **External or Maskable Interrupts**, External interrupts are received through pins on the processor or through the local APIC, like those collected from devices (keyboard, timer, NIC, etc). Maskable hardware interrupts that can be delivered through the INTR pin include all IA-32 architecture defined interrupt vectors from 0 through 255; those that can be delivered through the local APIC include interrupt vectors 16 through 255. Maskable interrupts do not occur unless the interrupt-enable flag (IF) is set.
-
    When interrupts 0 through 15 are delivered through the local APIC, the APIC indicates the receipt of an illegal vector.
 
    - **Software-Generated or Nonmaskable Interrupts**, The INT n instruction permits interrupts to be generated from within software by supplying an interrupt vector number as an operand. For example, the INT 35 instruction forces an implicit call to the interrupt handler for interrupt 35. These are received on the NMI (Non-Maskable Interrupt) input of the processor. The processor does not provide a mechanism to prevent nonmaskable interrupts, i.e, Interrupts generated in software with the INT n instruction cannot be masked by the IF flag in the EFLAGS register.
@@ -59,42 +58,43 @@ IDT Gate Descriptors structure:
 
 - TASK GATE:
 
-   bit 0 to bit 15 : RESERVED
-   bit 15 to bit 31 : TSS SEGMENT SELECTOR
-   bit 32 to bit 39 : RESERVED
-   bit 40 to bit 44 : 10100
-   bit 45 to bit 46 : DPL (A 2-bit value which defines the CPU Privilege Levels which are allowed to access this interrupt via the INT instruction. Hardware interrupts ignore this mechanism.)
-   bit 47 : P (Present bit. Must be set (1) for the descriptor to be valid)
-   bit 48 to bit 63 : RESERVED 
+      bit 0 to bit 15 : RESERVED
+      bit 15 to bit 31 : TSS SEGMENT SELECTOR
+      bit 32 to bit 39 : RESERVED
+      bit 40 to bit 44 : 10100
+      bit 45 to bit 46 : DPL (A 2-bit value which defines the CPU Privilege Levels which are allowed to access this interrupt via the INT instruction. Hardware interrupts ignore this mechanism.)
+      bit 47 : P (Present bit. Must be set (1) for the descriptor to be valid)
+      bit 48 to bit 63 : RESERVED 
 
 - INTERRUPT GATE:
 
-   bit 0 to bit 15 : OFFSET
-   bit 15 to bit 31 : SEGMENT SELECTOR
-   bit 32 to bit 36 : RESERVED
-   bit 37 to bit 39 : 000
-   bit 40 to bit 44 : 01110
-   bit 45 to bit 46 : DPL
-   bit 47 : P
-   bit 48 to bit 63 : OFFSET
+      bit 0 to bit 15 : OFFSET
+      bit 15 to bit 31 : SEGMENT SELECTOR
+      bit 32 to bit 36 : RESERVED
+      bit 37 to bit 39 : 000
+      bit 40 to bit 44 : 01110
+      bit 45 to bit 46 : DPL
+      bit 47 : P
+      bit 48 to bit 63 : OFFSET
 
 
 - TRAP GATE:
 
-   bit 0 to bit 15 : OFFSET
-   bit 15 to bit 31 : SEGMENT SELECTOR
-   bit 32 to bit 36 : RESERVED
-   bit 37 to bit 39 : 000
-   bit 40 to bit 44 : 11110
-   bit 45 to bit 46 : DPL
-   bit 47 : P
-   bit 48 to bit 63 : OFFSET
+      bit 0 to bit 15 : OFFSET
+      bit 15 to bit 31 : SEGMENT SELECTOR
+      bit 32 to bit 36 : RESERVED
+      bit 37 to bit 39 : 000
+      bit 40 to bit 44 : 11110
+      bit 45 to bit 46 : DPL
+      bit 47 : P
+      bit 48 to bit 63 : OFFSET
 
 
 
 
-- Interrupts 0 to 31 are pre-defined interrupts. (see table at https://wiki.jwo.cz/wiki/x86_protected_mode_interrupts)
-- Interrupts 32 to 255 are User Defined Interrupts
+Interrupts 0 to 31 are pre-defined interrupts. (see table at https://wiki.jwo.cz/wiki/x86_protected_mode_interrupts)
+
+Interrupts 32 to 255 are User Defined Interrupts
 
 
 
