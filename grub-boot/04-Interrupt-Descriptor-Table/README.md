@@ -21,6 +21,21 @@ There are two sources for interrupts and three sources for exceptions:
 
    - **Machine-check exceptions**, The P6 family and Pentium processors provide both internal and external machine-check mechanisms for checking the operation of the internal chip hardware and bus transactions. These mechanisms are implementation dependent. When a machine-check error is detected, the processor signals a machine-check exception and returns an error code.
 
+## EXCEPTION CLASSIFICATIONS
+
+- **Faults** :  A fault is an exception that can generally be corrected and that, once corrected, allows the program to be restarted with no loss of continuity. When a fault is reported, the processor restores the machine state to the state prior to the beginning of execution of the faulting instruction. The return address (saved contents of the CS and EIP registers) for the fault handler points to the faulting instruction, rather than to the instruction following the faulting instruction.
+
+A fault is an unintentional exception detected before the instruction finishes executing. e.g, Page Fault (when required memory page isn’t in RAM), Invalid opcode (instruction doesn’t exist).
+
+- **Traps** : A trap is an exception that is reported immediately following the execution of the trapping instruction. Traps allow execution of a program or task to be continued without loss of program continuity. The return address for the trap handler points to the instruction to be executed after the trapping instruction.
+
+A trap is an exception that is intentional and occurs after the instruction completes.
+
+- **Aborts** :  An abort is an exception that does not always report the precise location of the instruction causing the exception and does not allow a restart of the program or task that caused the exception. Aborts are used to report severe errors, such as hardware errors and inconsistent or illegal values in system tables.
+
+An abort is a serious error that prevents the instruction (and sometimes the process) from continuing.
+
+
 ## IDT
 
 The Interrupt Descriptor Table (IDT) is a binary data structure specific to the IA-32 and x86-64 architectures. It is the Protected Mode and Long Mode counterpart to the Real Mode **Interrupt Vector Table (IVT)** telling the CPU where the Interrupt Service Routines (ISR) are located (one per interrupt vector). It is similar to the GDT in structure.
@@ -59,7 +74,7 @@ IDT Gate Descriptors structure:
 - TASK GATE:
 
       bit 0 to bit 15 : RESERVED
-      bit 15 to bit 31 : TSS SEGMENT SELECTOR
+      bit 16 to bit 31 : TSS SEGMENT SELECTOR
       bit 32 to bit 39 : RESERVED
       bit 40 to bit 44 : 10100
       bit 45 to bit 46 : DPL (A 2-bit value which defines the CPU Privilege Levels which are allowed to access this interrupt via the INT instruction. Hardware interrupts ignore this mechanism.)
@@ -68,34 +83,50 @@ IDT Gate Descriptors structure:
 
 - INTERRUPT GATE:
 
-      bit 0 to bit 15 : OFFSET
-      bit 15 to bit 31 : SEGMENT SELECTOR
+      bit 0 to bit 15 : OFFSET (lower 16 bits of handler address)
+      bit 16 to bit 31 : SEGMENT SELECTOR
       bit 32 to bit 36 : RESERVED
       bit 37 to bit 39 : 000
       bit 40 to bit 44 : 01110
       bit 45 to bit 46 : DPL
       bit 47 : P
-      bit 48 to bit 63 : OFFSET
+      bit 48 to bit 63 : OFFSET (higher 16 bits of handler address for 32-bit entry)
 
 
 - TRAP GATE:
 
-      bit 0 to bit 15 : OFFSET
-      bit 15 to bit 31 : SEGMENT SELECTOR
+      bit 0 to bit 15 : OFFSET (lower 16 bits of handler address)
+      bit 16 to bit 31 : SEGMENT SELECTOR
       bit 32 to bit 36 : RESERVED
       bit 37 to bit 39 : 000
       bit 40 to bit 44 : 11110
       bit 45 to bit 46 : DPL
       bit 47 : P
-      bit 48 to bit 63 : OFFSET
+      bit 48 to bit 63 : OFFSET (higher 16 bits of handler address for 32-bit entry)
 
+#### Descriptor Privilege Level (DPL):
 
+DPL is a 2-bit field in an x86/x86-64 IDT (Interrupt Descriptor Table) entry that specifies the minimum privilege level required to invoke that interrupt or trap via the INT n instruction from software.
 
+Privilege levels (rings) in x86:
 
-Interrupts 0 to 31 are pre-defined interrupts. (see table at https://wiki.jwo.cz/wiki/x86_protected_mode_interrupts)
+   Ring 0 (DPL = 0): Kernel / highest privilege
+   Ring 1 (DPL = 1): Rarely used
+   Ring 2 (DPL = 2): Rarely used
+   Ring 3 (DPL = 3): User / lowest privilege
 
-Interrupts 32 to 255 are User Defined Interrupts
+The CPU checks CPL (Current Privilege Level) vs. DPL whenever a software interrupt (INT n) is executed:
 
+   CPL ≤ DPL: Allowed
+   CPL > DPL: General Protection Fault (#GP) occurs
+
+## EXCEPTION AND INTERRUPT VECTORS
+
+To aid in handling exceptions and interrupts, each architecturally defined exception and each interrupt condition requiring special handling by the processor is assigned a unique identification number, called a **vector number**. The processor uses the vector number assigned to an exception or interrupt as an index into the interrupt descriptor table (IDT).
+
+Vector numbers in the range 0 through 31 are reserved by the Intel 64 and IA-32 architectures for architecture-defined exceptions and interrupts. Not all of the vector numbers in this range have a currently defined function. The unassigned vector numbers in this range are reserved. Do not use the reserved vector numbers. (see table at https://wiki.jwo.cz/wiki/x86_protected_mode_interrupts)
+
+Vector numbers in the range 32 to 255 are designated as user-defined interrupts and are not reserved by the Intel 64 and IA-32 architecture.
 
 
 # References

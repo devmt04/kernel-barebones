@@ -7,10 +7,12 @@
 .section .text
 	.global _start 
 
-.extern main
 .extern load_gdt
+.extern load_idt
+.extern main
 
 _start:
  call load_gdt
+ call load_idt
  call main
  hlt

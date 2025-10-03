@@ -46,5 +46,8 @@ void main(){
        		vga_print_msg("Enter Key Pressed", vga_entry_color(VGA_COLOR_WHITE, VGA_COLOR_DARK_GREY), 5, 2);
 	 	if(scan_code == (uint8_t)0x9C) // Enter Released
        		vga_print_msg("Enter Key Released", vga_entry_color(VGA_COLOR_WHITE, VGA_COLOR_DARK_GREY), 5, 4);
-	 }
+	    if(scan_code == (uint8_t)0x17){
+            __asm__ __volatile__("int $0x20"); // 0x20 = 32
+        }
+     }
 }

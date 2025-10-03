@@ -28,10 +28,16 @@ $(OUTPUT) : $(BIN_DIR)/kernel.bin
 	cp grub.cfg build/iso/boot/grub
 	grub2-mkrescue -o $@ build/iso
 
-$(BIN_DIR)/kernel.bin : $(OBJ_DIR)/kernel_entry.o $(O_SRC) $(OBJ_DIR)/gdt.o
+$(BIN_DIR)/kernel.bin : $(OBJ_DIR)/kernel_entry.o $(O_SRC) $(OBJ_DIR)/gdt.o $(OBJ_DIR)/idt.o $(OBJ_DIR)/IDT_PROCEDURE.o
 	ld -m elf_i386 -T linker.ld -o $@ $^
 
 $(OBJ_DIR)/gdt.o : kernel/GDT/gdt.s 
+	as --32 -o $@ $^
+
+$(OBJ_DIR)/idt.o : kernel/IDT.s
+	as --32 -o $@ $^
+
+$(OBJ_DIR)/IDT_PROCEDURE.o : kernel/IDT_PROCEDURE.s
 	as --32 -o $@ $^
 
 $(OBJ_DIR)/kernel_entry.o : kernel/kernel_entry.s
